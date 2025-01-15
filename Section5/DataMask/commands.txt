@@ -1,0 +1,11 @@
+openssl base64 -in plain.txt -out encode.txt
+
+openssl base64 -d -in encode.txt -out decode.txt
+
+openssl enc -aes-256-cbc -pass pass:12345 -pbkdf2 -in plain.txt -out encrypt.txt -base64
+
+openssl enc -aes-256-cbc -base64 -pass pass:12345 -d -pbkdf2 -in encrypt.txt -out decrypt.txt
+
+echo -n "EazyBytes@12345" | openssl dgst -sha256
+
+echo -n "EazyByteaswewerwwerwerwerwerwerwerwerwers@12345" | openssl dgst -sha256
