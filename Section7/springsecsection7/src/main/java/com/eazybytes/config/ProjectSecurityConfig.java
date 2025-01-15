@@ -26,11 +26,12 @@ public class ProjectSecurityConfig {
     SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
         /*http.authorizeHttpRequests((requests) -> requests.anyRequest().permitAll());*/
         /*http.authorizeHttpRequests((requests) -> requests.anyRequest().denyAll());*/
-        http.requiresChannel(rcc -> rcc.anyRequest().requiresInsecure()) // allow http
+        http.sessionManagement(smc -> smc.invalidSessionUrl("/invalidSession"))
+                .requiresChannel(rcc -> rcc.anyRequest().requiresInsecure()) // allow http
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests((requests) -> requests
             .requestMatchers("/myAccount", "/myBalance", "/myLoans", "/myCards").authenticated()
-            .requestMatchers("/notices", "/contact", "/error", "/register").permitAll());
+            .requestMatchers("/notices", "/contact", "/error", "/register", "/invalidSession").permitAll());
         http.formLogin(withDefaults());
         http.httpBasic(hbc -> hbc.authenticationEntryPoint(new CustomBasicAuthenticationEntryPoint()));
         http.exceptionHandling(ehc -> ehc.accessDeniedHandler(new CustomAccessDeniedHandler()));
