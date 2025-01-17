@@ -37,7 +37,6 @@ public class ProjectSecurityConfig {
                         return config;
                     }
                 }))
-            .sessionManagement(smc -> smc.invalidSessionUrl("/invalidSession").maximumSessions(3).maxSessionsPreventsLogin(true).expiredUrl("/expiredUrl"))
             .requiresChannel(rcc -> rcc.anyRequest().requiresInsecure()) // allow http
             .authorizeHttpRequests((requests) -> requests
             .requestMatchers("/myAccount", "/myBalance", "/myLoans", "/myCards", "/user").authenticated()
