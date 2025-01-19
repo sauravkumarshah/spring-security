@@ -2,6 +2,7 @@ package com.eazybytes.config;
 
 import com.eazybytes.exceptionhandling.CustomAccessDeniedHandler;
 import com.eazybytes.exceptionhandling.CustomBasicAuthenticationEntryPoint;
+import com.eazybytes.filter.AuthoritiesLoggingAtFilter;
 import com.eazybytes.filter.CsrfCookieFilter;
 import com.eazybytes.filter.RequestValidationBeforeFilter;
 import com.eazybytes.filter.AuthoritiesLoggingAfterFilter;
@@ -53,6 +54,7 @@ public class ProjectSecurityConfig {
             .addFilterAfter(new CsrfCookieFilter(), BasicAuthenticationFilter.class)
             .addFilterBefore(new RequestValidationBeforeFilter(), BasicAuthenticationFilter.class)
             .addFilterAfter(new AuthoritiesLoggingAfterFilter(), BasicAuthenticationFilter.class)
+            .addFilterAt(new AuthoritiesLoggingAtFilter(), BasicAuthenticationFilter.class)
             .requiresChannel(rcc -> rcc.anyRequest().requiresInsecure()) // allow http
             .authorizeHttpRequests((requests) -> requests
                     /*.requestMatchers("/myAccount").hasAuthority("VIEWACCOUNT")
