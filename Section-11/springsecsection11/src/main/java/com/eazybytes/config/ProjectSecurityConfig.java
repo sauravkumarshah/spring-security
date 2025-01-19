@@ -2,10 +2,7 @@ package com.eazybytes.config;
 
 import com.eazybytes.exceptionhandling.CustomAccessDeniedHandler;
 import com.eazybytes.exceptionhandling.CustomBasicAuthenticationEntryPoint;
-import com.eazybytes.filter.AuthoritiesLoggingAtFilter;
-import com.eazybytes.filter.CsrfCookieFilter;
-import com.eazybytes.filter.RequestValidationBeforeFilter;
-import com.eazybytes.filter.AuthoritiesLoggingAfterFilter;
+import com.eazybytes.filter.*;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -35,8 +32,7 @@ public class ProjectSecurityConfig {
     @Bean
     SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
         CsrfTokenRequestAttributeHandler csrfTokenRequestAttributeHandler = new CsrfTokenRequestAttributeHandler(); // This will help to read the csrf token value from the UI send to the server side in the request header.
-        http
-                .sessionManagement(sessionConfig -> sessionConfig.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // The security context and session management help us to generate the jsessionId cookie and store it in the browser.
+        http.sessionManagement(sessionConfig -> sessionConfig.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .cors(corsConfig -> corsConfig.configurationSource(new CorsConfigurationSource() {
                     @Override
                     public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
@@ -57,6 +53,8 @@ public class ProjectSecurityConfig {
             .addFilterBefore(new RequestValidationBeforeFilter(), BasicAuthenticationFilter.class)
             .addFilterAfter(new AuthoritiesLoggingAfterFilter(), BasicAuthenticationFilter.class)
             .addFilterAt(new AuthoritiesLoggingAtFilter(), BasicAuthenticationFilter.class)
+            .addFilterAt(new JWTTokenGeneratorFilter(), BasicAuthenticationFilter.class)
+            .addFilterAfter(new JWTTokenValidatorFilter(), BasicAuthenticationFilter.class)
             .requiresChannel(rcc -> rcc.anyRequest().requiresInsecure()) // allow http
             .authorizeHttpRequests((requests) -> requests
                     /*.requestMatchers("/myAccount").hasAuthority("VIEWACCOUNT")
