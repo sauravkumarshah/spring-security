@@ -6,6 +6,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -46,6 +48,9 @@ public class UserController {
     @RequestMapping("/user")
     public Customer getUserDetailsAfterLogin(Authentication authentication) {
         Optional<Customer> optionalCustomer = customerRepository.findByEmail(authentication.getName());
+        // Clearing security context after successful response.
+//        SecurityContextHolder.getContextHolderStrategy().clearContext();
+//        SecurityContextHolder.getContext().getAuthentication().setAuthenticated(false);
         return optionalCustomer.orElse(null);
     }
 
