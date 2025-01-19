@@ -1,4 +1,4 @@
-# Spring Security Zero to Master along with JWT,OAUTH2
+# Spring Security with JWT,OAUTH2
 
 ## Topics covered in the course
 
@@ -16,11 +16,6 @@
 * Method level security in web/non-web applications
 * Social Login integrations into web applications
 * Set up of Authorization Server using KeyCloak, Spring Authorization Server 
-
-## Pre-requisite for the course
-- Good understanding on Java and Spring concepts
-- Basic understanding on SpringBoot & REST services is a bonus but not mandatory
-- Interest to learn and explore about Spring Security
 
 # Important Links
 
