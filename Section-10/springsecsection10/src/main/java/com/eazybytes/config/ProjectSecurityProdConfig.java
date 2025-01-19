@@ -2,7 +2,10 @@ package com.eazybytes.config;
 
 import com.eazybytes.exceptionhandling.CustomAccessDeniedHandler;
 import com.eazybytes.exceptionhandling.CustomBasicAuthenticationEntryPoint;
+import com.eazybytes.filter.AuthoritiesLoggingAfterFilter;
+import com.eazybytes.filter.AuthoritiesLoggingAtFilter;
 import com.eazybytes.filter.CsrfCookieFilter;
+import com.eazybytes.filter.RequestValidationBeforeFilter;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -37,7 +40,7 @@ public class ProjectSecurityProdConfig {
                     @Override
                     public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
                         CorsConfiguration config = new CorsConfiguration();
-                        config.setAllowedOrigins(Collections.singletonList("https://localhost:4200")); // https for prod profile but here it not work as localhost works only with http.
+                        config.setAllowedOrigins(Collections.singletonList("https://localhost:4200"));
                         config.setAllowedMethods(Collections.singletonList("*"));
                         config.setAllowCredentials(true);
                         config.setAllowedHeaders(Collections.singletonList("*"));
@@ -46,21 +49,20 @@ public class ProjectSecurityProdConfig {
                     }
                 }))
                 .csrf(csrfConfig -> csrfConfig.csrfTokenRequestHandler(csrfTokenRequestAttributeHandler)
-                        .ignoringRequestMatchers( "/contact","/register")
+                        .ignoringRequestMatchers("/contact", "/register")
                         .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
                 .addFilterAfter(new CsrfCookieFilter(), BasicAuthenticationFilter.class)
+                .addFilterBefore(new RequestValidationBeforeFilter(), BasicAuthenticationFilter.class)
+                .addFilterAfter(new AuthoritiesLoggingAfterFilter(), BasicAuthenticationFilter.class)
+                .addFilterAt(new AuthoritiesLoggingAtFilter(), BasicAuthenticationFilter.class)
                 .requiresChannel(rcc -> rcc.anyRequest().requiresSecure()) // Only HTTPS
                 .authorizeHttpRequests((requests) -> requests
-                        /*.requestMatchers("/myAccount").hasAuthority("VIEWACCOUNT")
-                        .requestMatchers("/myBalance").hasAnyAuthority("VIEWBALANCE", "VIEWACCOUNT")
-                        .requestMatchers("/myLoans").hasAuthority("VIEWLOANS")
-                        .requestMatchers("/myCards").hasAuthority("VIEWCARDS")*/
-                        .requestMatchers("/myAccount").hasRole("USER")
-                        .requestMatchers("/myBalance").hasAnyRole("USER", "ADMIN")
-                        .requestMatchers("/myLoans").hasRole("USER")
-                        .requestMatchers("/myCards").hasRole("USER")
-                        .requestMatchers("/user").authenticated()
-                        .requestMatchers("/notices", "/contact", "/error", "/register", "/invalidSession").permitAll());
+                .requestMatchers("/myAccount").hasRole("USER")
+                .requestMatchers("/myBalance").hasAnyRole("USER", "ADMIN")
+                .requestMatchers("/myLoans").hasRole("USER")
+                .requestMatchers("/myCards").hasRole("USER")
+                .requestMatchers("/user").authenticated()
+                .requestMatchers("/notices", "/contact", "/error", "/register", "/invalidSession").permitAll());
         http.formLogin(withDefaults());
         http.httpBasic(hbc -> hbc.authenticationEntryPoint(new CustomBasicAuthenticationEntryPoint()));
         http.exceptionHandling(ehc -> ehc.accessDeniedHandler(new CustomAccessDeniedHandler()));
@@ -74,6 +76,7 @@ public class ProjectSecurityProdConfig {
 
     /**
      * From Spring Security 6.3 version
+     *
      * @return
      */
     @Bean
