@@ -11,7 +11,7 @@ import com.eazybytes.model.Loans;
 @Repository
 public interface LoanRepository extends CrudRepository<Loans, Long> {
 
-	@PreAuthorize("hasRole('USER')")
+	@PreAuthorize("hasRole('ROOT')")
 	List<Loans> findByCustomerIdOrderByStartDtDesc(long customerId);
 
 }
