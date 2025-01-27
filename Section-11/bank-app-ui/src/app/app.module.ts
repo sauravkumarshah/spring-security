@@ -1,5 +1,5 @@
 import { BrowserModule } from '@angular/platform-browser';
-import { NgModule } from '@angular/core';
+import { APP_INITIALIZER, NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HttpClientModule, HTTP_INTERCEPTORS, HttpClientXsrfModule } from '@angular/common/http';
 import { AppRoutingModule } from './app-routing.module';
@@ -17,6 +17,23 @@ import { CardsComponent } from './components/cards/cards.component';
 import { XhrInterceptor } from './interceptors/app.request.interceptor';
 import { AuthActivateRouteGuard } from './routeguards/auth.routeguard';
 import { HomeComponent } from './components/home/home.component';
+import { KeycloakAngularModule, KeycloakService } from 'keycloak-angular';
+
+function initializeKeycloak(keycloak: KeycloakService) {
+  return () =>
+    keycloak.init({
+      config: {
+        url: 'http://localhost:8180/',
+        realm: 'eazybankdev',
+        clientId: 'eazypublicclient',
+      },
+      initOptions: {
+        pkceMethod: 'S256',
+        redirectUri: 'http://localhost:4200/dashboard',
+      },loadUserProfileAtStartUp: false
+    });
+}
+
 
 @NgModule({
   declarations: [
@@ -45,10 +62,14 @@ import { HomeComponent } from './components/home/home.component';
   ],
   providers: [
     {
-      provide : HTTP_INTERCEPTORS,
-      useClass : XhrInterceptor,
-      multi : true
-    },AuthActivateRouteGuard
+      provide : APP_INITIALIZER,
+      useFactory : initializeKeycloak,
+      // provide : HTTP_INTERCEPTORS,
+      // useClass : XhrInterceptor,
+      multi : true,
+      deps : [KeycloakService]
+    }
+    // ,AuthActivateRouteGuard
   ],
   bootstrap: [AppComponent]
 })
