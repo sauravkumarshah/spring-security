@@ -15,10 +15,13 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor
 public class EazyBankUserDetailsService implements UserDetailsService {
 
     private final CustomerRepository customerRepository;
+
+    public EazyBankUserDetailsService(CustomerRepository customerRepository) {
+        this.customerRepository = customerRepository;
+    }
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
